@@ -30,7 +30,7 @@ class MovieViewSet(viewsets.ModelViewSet):
     #     return {'request': self.request}
 
 
-class MovieImageView(generics.ListAPIView):
+class MovieImageView(generics.ListCreateAPIView):
     queryset = MovieImage.objects.all()
     serializer_class = MovieImageSerializer
 

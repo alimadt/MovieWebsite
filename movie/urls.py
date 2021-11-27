@@ -17,7 +17,7 @@ from django.contrib import admin
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 
-from main.views import GenreListView, MovieViewSet
+from main.views import GenreListView, MovieViewSet, MovieImageView
 
 router = DefaultRouter()
 router.register('movies', MovieViewSet)
@@ -26,4 +26,5 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('v1/api/genres/', GenreListView.as_view()),
     path('v1/api/', include(router.urls)),
+    path('v1/api/add-image/', MovieImageView.as_view()),
 ]
