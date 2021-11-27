@@ -14,12 +14,20 @@ class MovieSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Movie
-        fields = '__all__'
+        exclude = ('author', )
 
     def to_representation(self, instance):
         representation = super().to_representation(instance)
+        representation['author'] = instance.author.email
         representation['images'] = MovieImageSerializer(instance.images.all(), many=True, context=self.context).data
         return representation
+
+    def create(self, validated_data):
+        request = self.context.get('request')
+        user_id = request.user.id
+        validated_data['author_id'] = user_id
+        movie = Movie.objects.create(**validated_data)
+        return movie
 
 
 class MovieImageSerializer(serializers.ModelSerializer):
