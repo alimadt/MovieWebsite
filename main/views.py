@@ -1,6 +1,7 @@
 from django.db.models import Q
 from django.shortcuts import render
 from rest_framework import generics, viewsets, status
+from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.decorators import api_view, action
 from rest_framework.permissions import IsAdminUser
 from rest_framework.response import Response
@@ -8,6 +9,7 @@ from rest_framework.views import APIView
 
 from .models import Genre
 from .serializers import *
+from .service import MovieFilter
 
 
 class GenreListView(generics.ListAPIView):
@@ -18,6 +20,7 @@ class GenreListView(generics.ListAPIView):
 class MovieViewSet(viewsets.ModelViewSet):
     queryset = Movie.objects.all()
     serializer_class = MovieSerializer
+    filterset_class = MovieFilter
 
     def get_serializer_context(self):
         return {'request': self.request}

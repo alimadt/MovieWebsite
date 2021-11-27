@@ -18,6 +18,7 @@ class Movie(models.Model):
     description = models.TextField()
     poster = models.ImageField(upload_to="movies/")
     added = models.DateTimeField(auto_now_add=True)
+    year = models.PositiveIntegerField(null=True)
 
     def __str__(self):
         return self.title
