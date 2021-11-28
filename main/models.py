@@ -31,7 +31,6 @@ class Movie(models.Model):
     year = models.PositiveIntegerField(null=True)
     likes = GenericRelation(Like)
 
-
     def __str__(self):
         return self.title
 
@@ -53,4 +52,10 @@ class Comment(models.Model):
 
     def __str__(self):
         return f"{self.author}: {self.body[:20]}"
+
+
+class Favorite(models.Model):
+    movie = models.ForeignKey(Movie, on_delete=models.CASCADE, related_name='favorites')
+    user = models.ForeignKey(MyUser, on_delete=models.CASCADE, related_name='favorites')
+    favorite = models.BooleanField(default=False)
 

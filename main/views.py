@@ -3,10 +3,11 @@ from django.shortcuts import render
 from rest_framework import generics, viewsets, status
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.decorators import api_view, action
+from rest_framework.mixins import UpdateModelMixin
 from rest_framework.permissions import IsAdminUser, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from rest_framework.viewsets import ModelViewSet
+from rest_framework.viewsets import ModelViewSet, GenericViewSet
 
 from .models import Genre
 from .permissions import IsAuthorPermission
@@ -54,6 +55,25 @@ class MovieViewSet(LikedMixin, viewsets.ModelViewSet):
         serializer = MovieSerializer(queryset, many=True, context={'request': request})
         return Response(serializer.data, status=status.HTTP_200_OK)
 
+    @action(detail=False, methods=['get'])
+    def favorites(self, request):
+        queryset = Favorite.objects.all()
+        queryset = queryset.filter(user=request.user)
+        serializer = FavoriteSerializer(queryset, many=True, context={'request': request})
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    @action(detail=True, methods=['post'], permission_classes=[IsAuthenticated])
+    def favorite(self, request, pk=None):
+        movie = self.get_object()
+        obj, created = Favorite.objects.get_or_create(user=request.user, movie=movie)
+        if not created:
+            obj.favorite = not obj.favorite
+            obj.save()
+        if obj.favorite:
+            return Response('Movie was added to favorites', status=status.HTTP_200_OK)
+        else:
+            return Response('Movie was removed from favorites', status=status.HTTP_200_OK)
+
 
 class MovieImageView(generics.ListCreateAPIView):
     queryset = MovieImage.objects.all()
@@ -96,5 +116,3 @@ class ChangePasswordView(generics.UpdateAPIView):
             return Response(response)
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-
