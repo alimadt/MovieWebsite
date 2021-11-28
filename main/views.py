@@ -3,13 +3,26 @@ from django.shortcuts import render
 from rest_framework import generics, viewsets, status
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.decorators import api_view, action
-from rest_framework.permissions import IsAdminUser
+from rest_framework.permissions import IsAdminUser, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_framework.viewsets import ModelViewSet
 
 from .models import Genre
+from .permissions import IsAuthorPermission
 from .serializers import *
 from .service import MovieFilter
+
+
+class PermissionMixin:
+    def get_permissions(self):
+        if self.action in ['update', 'partial_update', 'destroy']:
+            permissions = [IsAuthorPermission]
+        elif self.action == 'create':
+            permissions = [IsAuthenticated]
+        else:
+            permissions = []
+        return [permission() for permission in permissions]
 
 
 class GenreListView(generics.ListAPIView):
@@ -47,3 +60,9 @@ class MovieImageView(generics.ListCreateAPIView):
 
     def get_serializer_context(self):
         return {'request': self.request}
+
+
+class CommentViewSet(PermissionMixin, ModelViewSet):
+    queryset = Comment.objects.all()
+    serializer_class = CommentSerializer
+

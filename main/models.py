@@ -27,3 +27,13 @@ class Movie(models.Model):
 class MovieImage(models.Model):
     image = models.ImageField(upload_to='shots', blank=True, null=True)
     movie = models.ForeignKey(Movie, on_delete=models.CASCADE, related_name='images')
+
+
+class Comment(models.Model):
+    movie = models.ForeignKey(Movie, on_delete=models.CASCADE, related_name='comments')
+    body = models.TextField()
+    author = models.ForeignKey(MyUser, on_delete=models.CASCADE, related_name='comments')
+    created = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.author}: {self.body[:20]}"
