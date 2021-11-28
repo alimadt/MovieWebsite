@@ -19,7 +19,7 @@ from django.contrib import admin
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 
-from main.views import GenreListView, MovieViewSet, MovieImageView, CommentViewSet
+from main.views import GenreListView, MovieViewSet, MovieImageView, CommentViewSet, ChangePasswordView
 
 router = DefaultRouter()
 router.register('movies', MovieViewSet)
@@ -31,4 +31,5 @@ urlpatterns = [
     path('v1/api/', include(router.urls)),
     path('v1/api/add-image/', MovieImageView.as_view()),
     path('v1/api/user/', include('user.urls')),
+    path('v1/api/change-password/', ChangePasswordView.as_view()),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

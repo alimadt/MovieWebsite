@@ -74,4 +74,9 @@ class FanSerializer(serializers.ModelSerializer):
         fields = ('email', )
 
 
+class ChangePasswordSerializer(serializers.Serializer):
+    model = MyUser
+    old_password = serializers.CharField(required=True)
+    new_password = serializers.CharField(required=True)
+
 
