@@ -91,7 +91,7 @@ class CommentViewSet(PermissionMixin, ModelViewSet):
 class ChangePasswordView(generics.UpdateAPIView):
     serializer_class = ChangePasswordSerializer
     model = MyUser
-    permission_classes = (IsAuthenticated,)
+    permission_classes = [IsAuthenticated, ]
 
     def get_object(self, queryset=None):
         obj = self.request.user
@@ -116,3 +116,8 @@ class ChangePasswordView(generics.UpdateAPIView):
             return Response(response)
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class RatingViewSet(PermissionMixin, viewsets.ModelViewSet):
+    queryset = Rating.objects.all()
+    serializer_class = RatingSerializer

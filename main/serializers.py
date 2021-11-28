@@ -1,3 +1,4 @@
+from django.db.models import Avg
 from rest_framework import serializers
 
 from .models import *
@@ -22,7 +23,9 @@ class MovieSerializer(serializers.ModelSerializer):
         representation = super().to_representation(instance)
         representation['author'] = instance.author.email
         representation['images'] = MovieImageSerializer(instance.images.all(), many=True, context=self.context).data
+        representation['rating'] = instance.rating.aggregate(Avg('rating'))
         representation['comments'] = CommentSerializer(instance.comments.all(), many=True).data
+
         return representation
 
     def create(self, validated_data):
@@ -92,4 +95,19 @@ class FavoriteSerializer(serializers.ModelSerializer):
         representation['movie'] = instance.movie.title
         return representation
 
+
+class RatingSerializer(serializers.ModelSerializer):
+    user = serializers.ReadOnlyField(source='user.email')
+
+    class Meta:
+        model = Rating
+        fields = '__all__'
+
+    def create(self, validated_data):
+        request = self.context.get('request')
+        movie = validated_data.get('movie')
+        rating = Rating.objects.get_or_create(user=request.user, movie=movie)[0]
+        rating.rating = validated_data['rating']
+        rating.save()
+        return rating
 
