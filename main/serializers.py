@@ -1,6 +1,7 @@
 from rest_framework import serializers
 
 from .models import *
+from main import service as likes_services
 
 
 class GenreSerializer(serializers.ModelSerializer):
@@ -11,10 +12,11 @@ class GenreSerializer(serializers.ModelSerializer):
 
 class MovieSerializer(serializers.ModelSerializer):
     added = serializers.DateTimeField(format='%d/%m/%Y %H:%M:%S', read_only=True)
+    is_fan = serializers.SerializerMethodField()
 
     class Meta:
         model = Movie
-        exclude = ('author', )
+        fields = ('genre', 'title', 'description', 'poster', 'year', 'total_likes', 'is_fan', 'added')
 
     def to_representation(self, instance):
         representation = super().to_representation(instance)
@@ -29,6 +31,10 @@ class MovieSerializer(serializers.ModelSerializer):
         validated_data['author_id'] = user_id
         movie = Movie.objects.create(**validated_data)
         return movie
+
+    def get_is_fan(self, obj) -> bool:
+        user = self.context.get('request').user
+        return likes_services.is_fan(obj, user)
 
 
 class MovieImageSerializer(serializers.ModelSerializer):
@@ -60,3 +66,12 @@ class CommentSerializer(serializers.ModelSerializer):
         request = self.context.get('request')
         reply = Comment.objects.create(author=request.user, **validated_data)
         return reply
+
+
+class FanSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = MyUser
+        fields = ('email', )
+
+
+

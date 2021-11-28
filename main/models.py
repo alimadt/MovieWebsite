@@ -1,3 +1,6 @@
+from django.conf import settings
+from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelation
+from django.contrib.contenttypes.models import ContentType
 from django.db import models
 from datetime import timezone
 from user.models import MyUser
@@ -11,6 +14,13 @@ class Genre(models.Model):
         return self.name
 
 
+class Like(models.Model):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='likes', on_delete=models.CASCADE)
+    content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
+    object_id = models.PositiveIntegerField()
+    content_object = GenericForeignKey('content_type', 'object_id')
+
+
 class Movie(models.Model):
     author = models.ForeignKey(MyUser, on_delete=models.CASCADE, related_name='movies')
     genre = models.ForeignKey(Genre, on_delete=models.CASCADE, related_name='movies')
@@ -19,9 +29,15 @@ class Movie(models.Model):
     poster = models.ImageField(upload_to="movies/")
     added = models.DateTimeField(auto_now_add=True)
     year = models.PositiveIntegerField(null=True)
+    likes = GenericRelation(Like)
+
 
     def __str__(self):
         return self.title
+
+    @property
+    def total_likes(self):
+        return self.likes.count()
 
 
 class MovieImage(models.Model):
@@ -37,3 +53,4 @@ class Comment(models.Model):
 
     def __str__(self):
         return f"{self.author}: {self.body[:20]}"
+

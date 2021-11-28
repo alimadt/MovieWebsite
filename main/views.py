@@ -12,6 +12,7 @@ from .models import Genre
 from .permissions import IsAuthorPermission
 from .serializers import *
 from .service import MovieFilter
+from .mixins import LikedMixin
 
 
 class PermissionMixin:
@@ -30,7 +31,7 @@ class GenreListView(generics.ListAPIView):
     serializer_class = GenreSerializer
 
 
-class MovieViewSet(viewsets.ModelViewSet):
+class MovieViewSet(LikedMixin, viewsets.ModelViewSet):
     queryset = Movie.objects.all()
     serializer_class = MovieSerializer
     filterset_class = MovieFilter
@@ -65,4 +66,5 @@ class MovieImageView(generics.ListCreateAPIView):
 class CommentViewSet(PermissionMixin, ModelViewSet):
     queryset = Comment.objects.all()
     serializer_class = CommentSerializer
+
 
