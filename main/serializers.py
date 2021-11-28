@@ -20,6 +20,7 @@ class MovieSerializer(serializers.ModelSerializer):
         representation = super().to_representation(instance)
         representation['author'] = instance.author.email
         representation['images'] = MovieImageSerializer(instance.images.all(), many=True, context=self.context).data
+        representation['comments'] = CommentSerializer(instance.comments.all(), many=True).data
         return representation
 
     def create(self, validated_data):
@@ -46,3 +47,16 @@ class MovieImageSerializer(serializers.ModelSerializer):
         representation = super().to_representation(instance)
         representation['image'] = self._get_image_url(instance)
         return representation
+
+
+class CommentSerializer(serializers.ModelSerializer):
+    author = serializers.ReadOnlyField(source='author.email')
+
+    class Meta:
+        model = Comment
+        fields = '__all__'
+
+    def create(self, validated_data):
+        request = self.context.get('request')
+        reply = Comment.objects.create(author=request.user, **validated_data)
+        return reply
