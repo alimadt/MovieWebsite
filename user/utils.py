@@ -1,4 +1,7 @@
 from django.core.mail import send_mail
+from django.dispatch import receiver
+from django.urls import reverse
+from django_rest_passwordreset.signals import reset_password_token_created
 
 
 def send_activation_code(email, activation_code):
@@ -18,12 +21,15 @@ def send_activation_code(email, activation_code):
     )
 
 
-def send_welcome_email(email):
-    message = f'You were successfully registered at MyBlog! Thanks for the interest in our site!'
+@receiver(reset_password_token_created)
+def password_reset_token_created(sender, instance, reset_password_token, *args, **kwargs):
+
+    reset_password_url = 'http://localhost:5000'+'{}?token={}'.format(reverse('password_reset:reset-password-request'), reset_password_token.key)
+
     send_mail(
-        'Registration at MyBlog',
-        message,
-        'myblogadmin@gmail.com',
-        [email],
+        "Password Reset",
+        reset_password_url,
+        "noreply@somehost.local",
+        [reset_password_token.user.email],
         fail_silently=False
-        )
+    )

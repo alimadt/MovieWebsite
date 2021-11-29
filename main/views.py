@@ -121,3 +121,4 @@ class ChangePasswordView(generics.UpdateAPIView):
 class RatingViewSet(PermissionMixin, viewsets.ModelViewSet):
     queryset = Rating.objects.all()
     serializer_class = RatingSerializer
+

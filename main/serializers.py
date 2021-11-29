@@ -1,3 +1,4 @@
+from django.contrib.sites.shortcuts import get_current_site
 from django.db.models import Avg
 from rest_framework import serializers
 
@@ -110,4 +111,3 @@ class RatingSerializer(serializers.ModelSerializer):
         rating.rating = validated_data['rating']
         rating.save()
         return rating
-

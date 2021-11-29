@@ -24,29 +24,31 @@ class RegisterSerializer(serializers.ModelSerializer):
         email = validated_data.get('email')
         password = validated_data.get('password')
         user = MyUser.objects.create_user(email=email, password=password)
-        send_activation_code(email=user.email, activation_code=user.activation_code)
+        send_activation_code(email=user.email, activation_code=user.activation_code, status='register')
         return user
 
 
-class LoginSerializer(serializers.Serializer):
-    email = serializers.EmailField()
-    password = serializers.CharField(
-        label='Password',
-        style={'input_type': 'password'},
-        trim_whitespace=False
-    )
+# class LoginSerializer(serializers.Serializer):
+#     email = serializers.EmailField()
+#     password = serializers.CharField(
+#         label='Password',
+#         style={'input_type': 'password'},
+#         trim_whitespace=False
+#     )
+#
+#     def validate(self, attrs):
+#         email = attrs.get('email')
+#         password = attrs.get('password')
+#
+#         if email and password:
+#             user = authenticate(request=self.context.get('request'), email=email, password=password)
+#             if not user:
+#                 message = 'Provided credentials are not correct'
+#                 raise serializers.ValidationError(message, code='authorization')
+#         else:
+#             message = 'You must fill up all of the fields'
+#             raise serializers.ValidationError(message, code='authorization')
+#         attrs['user'] = user
+#         return attrs
 
-    def validate(self, attrs):
-        email = attrs.get('email')
-        password = attrs.get('password')
 
-        if email and password:
-            user = authenticate(request=self.context.get('request'), email=email, password=password)
-            if not user:
-                message = 'Provided credentials are not correct'
-                raise serializers.ValidationError(message, code='authorization')
-        else:
-            message = 'You must fill up all of the fields'
-            raise serializers.ValidationError(message, code='authorization')
-        attrs['user'] = user
-        return attrs

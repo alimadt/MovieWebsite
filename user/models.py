@@ -1,6 +1,7 @@
 from django.contrib.auth.base_user import BaseUserManager
 from django.contrib.auth.models import AbstractUser
 from django.db import models
+from django.utils.crypto import get_random_string
 
 
 class MyUserManager(BaseUserManager):
@@ -36,13 +37,9 @@ class MyUser(AbstractUser):
 
     objects = MyUserManager()
 
+    def create_activation_code(self):
+        code = get_random_string(length=25, allowed_chars='abcdefghijklmnopqrstuwxyz1234567890')
+        self.activation_code = code
+
     def __str__(self):
         return self.email
-
-    def create_activation_code(self):
-        import hashlib
-        string = self.email + str(self.id)
-        encode_string = string.encode()
-        md5_object = hashlib.md5(encode_string)
-        activation_code = md5_object.hexdigest()
-        self.activation_code = activation_code

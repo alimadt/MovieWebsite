@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.2/ref/settings/
 """
 import os
+from datetime import timedelta
 from pathlib import Path
 from decouple import config
 
@@ -49,6 +50,7 @@ INSTALLED_APPS = [
     'phonenumber_field',
     'drf_yasg',
     'django_filters',
+    'django_rest_passwordreset',
 ]
 
 MIDDLEWARE = [
@@ -163,4 +165,9 @@ REST_FRAMEWORK = {
     ),
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
     'PAGE_SIZE': 3,
+}
+
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=600),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=7)
 }
