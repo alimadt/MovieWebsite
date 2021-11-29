@@ -11,3 +11,4 @@ drf-yasg
 django-filter
 celery
 django-rest-passwordreset
+redis

@@ -2,8 +2,9 @@ from django.core.mail import send_mail
 from django.dispatch import receiver
 from django.urls import reverse
 from django_rest_passwordreset.signals import reset_password_token_created
+from movie.celery import app
 
-
+@app.task
 def send_activation_code(email, activation_code):
     activation_url = f'http://localhost:5000/v1/api/user/activate/{activation_code}'
     message = f"""
