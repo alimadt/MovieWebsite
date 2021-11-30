@@ -8,7 +8,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from .models import MyUser
-from .serializers import RegisterSerializer
+from .serializers import RegisterSerializer, LoginSerializer
 from .utils import send_activation_code
 
 
@@ -22,26 +22,25 @@ class RegisterView(APIView):
 
 
 class ActivationView(APIView):
-    def get(self, request, email, activation_code):
-        user = MyUser.objects.get(email=email, activation_code=activation_code)
-        if not user:
-            return Response('User was not found', status=status.HTTP_400_BAD_REQUEST)
-        user.activation_code = ''
+    def get(self, request, activation_code):
+        User = get_user_model()
+        user = get_object_or_404(User, activation_code=activation_code)
         user.is_active = True
+        user.activation_code = ''
         user.save()
-        return Response('User was activated', status=status.HTTP_200_OK)
+        return Response("Your account was successfully activated", status=status.HTTP_200_OK)
 
 
-# class LoginView(ObtainAuthToken):
-#     serializer_class = LoginSerializer
-#
-#
-# class LogoutView(APIView):
-#     permission_classes = [IsAuthenticated, ]
-#
-#     def post(self, request):
-#         user = request.user
-#         Token.objects.filter(user=user).delete()
-#         return Response('You have logged out', status=status.HTTP_200_OK)
+class LoginView(ObtainAuthToken):
+    serializer_class = LoginSerializer
+
+
+class LogoutView(APIView):
+    permission_classes = [IsAuthenticated, ]
+
+    def post(self, request):
+        user = request.user
+        Token.objects.filter(user=user).delete()
+        return Response('You have logged out', status=status.HTTP_200_OK)
 
 

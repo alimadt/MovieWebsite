@@ -18,7 +18,7 @@ class MovieSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Movie
-        fields = ('genre', 'title', 'description', 'poster', 'year', 'total_likes', 'is_fan', 'added')
+        fields = ('id', 'genre', 'title', 'description', 'poster', 'year', 'total_likes', 'is_fan', 'added')
 
     def to_representation(self, instance):
         representation = super().to_representation(instance)

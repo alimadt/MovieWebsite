@@ -1,6 +1,7 @@
 from django.db.models import Q
 from django.shortcuts import render
-from rest_framework import generics, viewsets, status
+
+from rest_framework import generics, viewsets, status, filters
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.decorators import api_view, action
 from rest_framework.mixins import UpdateModelMixin
@@ -33,6 +34,8 @@ class GenreListView(generics.ListAPIView):
 
 
 class MovieViewSet(LikedMixin, viewsets.ModelViewSet):
+    # search_fields = ['title', 'description']
+    # filter_backends = (filters.SearchFilter,)
     queryset = Movie.objects.all()
     serializer_class = MovieSerializer
     filterset_class = MovieFilter
@@ -46,14 +49,6 @@ class MovieViewSet(LikedMixin, viewsets.ModelViewSet):
         else:
             permissions = []
         return [permission() for permission in permissions]
-
-    @action(detail=False, methods=['get'])
-    def search(self, request, pk=None):
-        q = request.query_params.get('q')
-        queryset = self.get_queryset()
-        queryset = queryset.filter(Q(title__icontains=q) | Q(description__icontains=q))
-        serializer = MovieSerializer(queryset, many=True, context={'request': request})
-        return Response(serializer.data, status=status.HTTP_200_OK)
 
     @action(detail=False, methods=['get'])
     def favorites(self, request):
